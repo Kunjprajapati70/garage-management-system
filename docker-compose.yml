@@ -1,0 +1,23 @@
+services:
+  server:
+    build: ./server
+    restart: unless-stopped
+    env_file:
+      - ./server/.env
+    environment:
+      CLIENT_URL: http://localhost:8080
+    ports:
+      - '5000:5000'
+    volumes:
+      - uploads_data:/app/uploads
+
+  client:
+    build: ./client
+    restart: unless-stopped
+    ports:
+      - '8080:80'
+    depends_on:
+      - server
+
+volumes:
+  uploads_data:

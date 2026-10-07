@@ -1,0 +1,18 @@
+{
+  "name": "apex-motors-gms",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Apex Motors garage management system",
+  "scripts": {
+    "dev": "concurrently -n server,client -c blue,green \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "lint": "npm run lint --prefix server && npm run lint --prefix client",
+    "test": "npm test --prefix server && npm test --prefix client",
+    "build": "npm run build --prefix client",
+    "seed": "npm run seed --prefix server",
+    "seed:reset": "npm run seed:reset --prefix server",
+    "typecheck": "npm run typecheck --prefix server && npm run typecheck --prefix client"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
