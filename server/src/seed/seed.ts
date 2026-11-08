@@ -442,7 +442,9 @@ async function main() {
       const seq = (requestSeq.get(stamp) || 0) + 1
       requestSeq.set(stamp, seq)
       const assignable = mechanics.filter((item) => item.status !== 'off_duty')
-      const mechanic = status === 'pending' ? undefined : pick(assignable)
+      // Reserve 20 mechanics without active jobs so availableMechanics > 0 on dashboard
+      const activePool = assignable.length > 25 ? assignable.slice(20) : assignable
+      const mechanic = status === 'pending' ? undefined : pick(activePool)
       const chosenServices = faker.helpers.arrayElements(services.filter((item) => item.isActive), faker.number.int({ min: 1, max: 3 }))
       const chosenParts = status === 'pending' ? [] : faker.helpers.arrayElements(parts, faker.number.int({ min: 0, max: 4 }))
       const serviceLines = chosenServices.map((service) => ({

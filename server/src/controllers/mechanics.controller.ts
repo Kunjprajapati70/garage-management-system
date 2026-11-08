@@ -10,6 +10,8 @@ import { sendSuccess } from '../utils/apiResponse.js'
 import { escapeRegex, pageMeta, parseSort } from '../utils/helpers.js'
 import { writeAudit } from '../services/audit.js'
 import { sendLoginMail } from '../services/credentials.js'
+import { emitOperational } from '../sockets/io.js'
+import { Events, MECHANIC_STATUSES } from '../constants.js'
 
 const ACTIVE = ['diagnosing', 'waiting_for_parts', 'in_progress']
 
@@ -29,6 +31,7 @@ export async function refreshMechanicLoad(mechanicId: string) {
   mechanic.activeJobs = activeJobs
   if (mechanic.status !== 'off_duty') mechanic.status = activeJobs > 0 ? 'busy' : 'available'
   await mechanic.save()
+  emitOperational(Events.dashboardUpdated, { mechanicId: mechanic._id, status: mechanic.status })
   return mechanic
 }
 
@@ -64,6 +67,7 @@ export const createMechanic = asyncHandler(async (req: Request, res: Response) =
     relatedId: user._id.toString(),
   })
   await writeAudit(req, 'CREATE', 'Mechanic', `Created mechanic ${mechanic.name}`, mechanic._id.toString())
+  emitOperational(Events.dashboardUpdated, { mechanicId: mechanic._id })
   sendSuccess(res, mechanic, mailed.sent ? 'Mechanic created. Login email and password were sent.' : `Mechanic created, but the email was not sent. ${mailed.message}`, 201)
 })
 
@@ -131,6 +135,7 @@ export const deactivateMechanic = asyncHandler(async (req: Request, res: Respons
   await mechanic.save()
   await User.findByIdAndUpdate(mechanic.user, { isActive: false })
   await writeAudit(req, 'DELETE', 'Mechanic', `Deactivated mechanic ${mechanic.name}`, mechanic._id.toString())
+  emitOperational(Events.dashboardUpdated, { mechanicId: mechanic._id, status: 'off_duty' })
   sendSuccess(res, mechanic, 'Mechanic deactivated')
 })
 
@@ -140,13 +145,18 @@ export const updateMechanic = asyncHandler(async (req: Request, res: Response) =
   mechanic.specialization = req.body.specialization
   mechanic.experienceYears = req.body.experienceYears
   mechanic.hourlyRate = req.body.hourlyRate
-  mechanic.status = req.body.status === 'off_duty' ? 'off_duty' : mechanic.activeJobs > 0 ? 'busy' : 'available'
+  if (req.body.status && (MECHANIC_STATUSES as readonly string[]).includes(req.body.status)) {
+    mechanic.status = req.body.status
+  } else {
+    mechanic.status = mechanic.status === 'off_duty' ? 'off_duty' : mechanic.activeJobs > 0 ? 'busy' : 'available'
+  }
   if (req.body.phone !== undefined) {
     mechanic.phone = req.body.phone || undefined
     await User.findByIdAndUpdate(mechanic.user, { phone: mechanic.phone })
   }
   await mechanic.save()
   await writeAudit(req, 'UPDATE', 'Mechanic', `Updated mechanic ${mechanic.name}`, mechanic._id.toString(), { status: mechanic.status })
+  emitOperational(Events.dashboardUpdated, { mechanicId: mechanic._id, status: mechanic.status })
   sendSuccess(res, mechanic, 'Mechanic updated')
 })
 

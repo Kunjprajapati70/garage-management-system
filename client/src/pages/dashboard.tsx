@@ -44,7 +44,7 @@ export function DashboardPage() {
   useEffect(() => {
     load()
     return subscribeRealtime((event) => {
-      if (event === 'dashboard:updated' || event.startsWith('serviceRequest') || event.startsWith('invoice') || event.startsWith('billing') || event.startsWith('customer') || event.startsWith('vehicle') || event.startsWith('service:') || event.startsWith('parts:')) load()
+      if (event === 'dashboard:updated' || event.startsWith('mechanic') || event.startsWith('serviceRequest') || event.startsWith('invoice') || event.startsWith('billing') || event.startsWith('customer') || event.startsWith('vehicle') || event.startsWith('service:') || event.startsWith('parts:')) load()
     })
   }, [])
 

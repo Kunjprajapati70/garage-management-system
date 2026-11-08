@@ -99,11 +99,11 @@ export function ReportsPage() {
             {['Revenue', 'Services', 'Mechanics', 'Customers', 'Vehicles', 'Parts', 'Outstanding'].map((label) => <Tab key={label} label={label} />)}
           </Tabs>
           {tab === 0 && <AxisChart title="Revenue report" data={overview.revenueTrend} xKey="month" yKey="revenue" xLabel="Month" yLabel="Revenue (₹)" formatter={inr} />}
-          {tab === 1 && <AxisChart title="Service report" data={statusData} xKey="label" yKey="count" xLabel="Status" yLabel="Number of Requests" angled color="#e09f3e" />}
-          {tab === 2 && <AxisChart title="Mechanic performance" data={suite.mechanicPerformance} xKey="name" yKey="completed" xLabel="Mechanic" yLabel="Completed Jobs" angled color="#1a6f96" />}
+          {tab === 1 && <AxisChart title="Service report" data={statusData} xKey="label" yKey="count" xLabel="Status" yLabel="Number of Requests" angled />}
+          {tab === 2 && <AxisChart title="Mechanic performance" data={suite.mechanicPerformance} xKey="name" yKey="completed" xLabel="Mechanic" yLabel="Completed Jobs" angled />}
           {tab === 3 && <AxisChart title="Customer report" data={suite.customers} xKey="name" yKey="requests" xLabel="Customer" yLabel="Number of Requests" angled />}
-          {tab === 4 && <AxisChart title="Vehicle service report" data={suite.vehiclesByMake} xKey="make" yKey="services" xLabel="Car Name" yLabel="Number of Requests" angled color="#1e7f4f" />}
-          {tab === 5 && <AxisChart title="Parts usage" data={suite.partsUsage} xKey="name" yKey="quantity" xLabel="Part Name" yLabel="Quantity Used" angled color="#c0392b" />}
+          {tab === 4 && <AxisChart title="Vehicle service report" data={suite.vehiclesByMake} xKey="make" yKey="services" xLabel="Car Name" yLabel="Number of Requests" angled />}
+          {tab === 5 && <AxisChart title="Parts usage" data={suite.partsUsage} xKey="name" yKey="quantity" xLabel="Part Name" yLabel="Quantity Used" angled />}
           {tab === 6 && (
             <DataTable
               columns={[
